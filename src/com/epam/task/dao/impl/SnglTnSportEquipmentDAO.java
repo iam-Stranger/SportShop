@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.epam.task.bean.Category;
+import com.epam.task.bean.Client;
 import com.epam.task.bean.Shop;
 import com.epam.task.bean.SportEquipment;
 import com.epam.task.dao.SportEquipmentDAO;
@@ -51,7 +52,19 @@ public class SnglTnSportEquipmentDAO implements SportEquipmentDAO {
 	@Override
 	public List<SportEquipment> getRentList() throws DAOException {
 		
-		return null;
+		ArrayList<SportEquipment> list = new ArrayList<>();
+		Shop shop = ShopProvider.getShop();
+		List<Client> clients = shop.getClients();
+
+		for (Client client : clients) {
+			for (SportEquipment rec : client.getRentUnit().getUnitsArr()) {
+				if (rec != null) {
+					list.add(rec);
+				}
+			}
+		}
+
+		return list;
 	}
 
 }
