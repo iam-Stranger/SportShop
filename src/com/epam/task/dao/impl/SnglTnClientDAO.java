@@ -12,14 +12,14 @@ import com.epam.task.dao.exception.DAOException;
 import com.epam.task.dao.provider.ShopProvider;
 
 public class SnglTnClientDAO implements ClientDAO {
-	
-	private static final String MINUS = "minus";
-	private static final String PLUS = "plus";
 
+	private static final int COUNT_OF_RENT = 3;
+	private static final String MINUS_FROM_STORE = "minus";
+	private static final String PLUS_FROM_STORE = "plus";
 
 	@Override
 	public void addNewClient(String login) throws DAOException {
-		RentUnit rentUnit = new RentUnit(new SportEquipment[3]);
+		RentUnit rentUnit = new RentUnit(new SportEquipment[COUNT_OF_RENT]);
 		Client client = new Client(login, rentUnit);
 
 		Shop shop = ShopProvider.getShop();
@@ -38,20 +38,21 @@ public class SnglTnClientDAO implements ClientDAO {
 
 		SportEquipment equipment = findSportEquipmentByTitle(equipmentTitle);
 		if (equipment == null) {
-			throw new DAOException("SportEquipment not found");
+			throw new DAOException("Equipment not found");
 		}
 
-		Integer count = findSportEquipmentCount(equipmentTitle);
-		if (count <= 0) {
-			throw new DAOException("SportEquipment count = 0");
+		Integer countFromStore = findSportEquipmentCount(equipmentTitle);
+		if (countFromStore <= 0) {
+			throw new DAOException("Equipment count = 0");
 		}
 
-		
-		
-		sportEquipmentChangeCount(equipmentTitle, MINUS);
-		
-		SportEquipment[] array = client.getRentUnit().getUnitsArr();
-		
+		int countRentUnins = countFreeRentUnit(client);
+		if (countRentUnins <= 0) {
+			throw new DAOException("Client has maximum equipment");
+		}
+
+		sportEquipmentChangeCount(equipmentTitle, MINUS_FROM_STORE);
+		rentUnitAdd(client, equipment);
 
 	}
 
@@ -116,14 +117,46 @@ public class SnglTnClientDAO implements ClientDAO {
 			SportEquipment equipment = entry.getKey();
 
 			if (equipment.getTitle().equals(equipmentTitle)) {
-				if (action.equals(MINUS)) {
+				if (action.equals(MINUS_FROM_STORE)) {
 					entry.setValue(entry.getValue() - 1);
-				} else if (action.equals(PLUS)) {
+				} else if (action.equals(PLUS_FROM_STORE)) {
 					entry.setValue(entry.getValue() + 1);
 				}
 			}
 		}
 
+	}
+
+	private void rentUnitAdd(Client client, SportEquipment equipment) {
+
+		SportEquipment[] array = client.getRentUnit().getUnitsArr();
+
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == null) {
+				array[i] = equipment;
+
+				RentUnit unit = new RentUnit();
+				unit.setUnitsArr(array);
+				client.setRentUnit(unit);
+
+				return;
+			}
+		}
+
+	}
+
+	private int countFreeRentUnit(Client client) {
+		int count = 0;
+
+		SportEquipment[] array = client.getRentUnit().getUnitsArr();
+
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == null) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 }

@@ -12,6 +12,7 @@ public interface SportEquipmentDAO {
 
 	void deleteEquipment(SportEquipment equipment) throws DAOException;
 	
-	List<SportEquipment> getEquipmentsList() throws DAOException;
+	List<SportEquipment> getStoreList() throws DAOException;
+	List<SportEquipment> getRentList() throws DAOException;
 
 }

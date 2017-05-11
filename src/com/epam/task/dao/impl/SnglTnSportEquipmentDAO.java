@@ -1,5 +1,6 @@
 package com.epam.task.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,19 +20,37 @@ public class SnglTnSportEquipmentDAO implements SportEquipmentDAO {
 		Shop shop = ShopProvider.getShop();
 		Map<SportEquipment, Integer> goods = shop.getGoods();
 		goods.put(equipment, count);
-		
-		
+			
 	}
 
 	@Override
 	public void deleteEquipment(SportEquipment equipment) throws DAOException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public List<SportEquipment> getEquipmentsList() throws DAOException {
-		// TODO Auto-generated method stub
+	public List<SportEquipment> getStoreList() throws DAOException {
+		
+		ArrayList<SportEquipment> list = new ArrayList<>();
+		Shop shop = ShopProvider.getShop();
+		Map<SportEquipment, Integer> goods = shop.getGoods();
+
+		for (Map.Entry<SportEquipment, Integer> entry : goods.entrySet()) {
+			SportEquipment equipment = entry.getKey();
+			Integer count = entry.getValue();
+				
+			for (int i=0; i<count; i++){
+				list.add(equipment);
+			}
+				
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<SportEquipment> getRentList() throws DAOException {
+		
 		return null;
 	}
 
